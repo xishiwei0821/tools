@@ -1,0 +1,24 @@
+{
+    "name": "shiwei/tools",
+    "description": "我的工具类库",
+    "type": "library",
+    "keywords": ["tools"],
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Shiwei\\Tools\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "ShiweiXi",
+            "email": "xishiwei0821@gmail.com",
+            "homepage": "https://github.com/xishiwei0821"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "ext-curl": "*",
+        "ext-json": "*"
+    }
+}

@@ -51,7 +51,7 @@ class Curl
         }
         
         // 设置请求头
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $realHeader);
         // 设置头文件的信息作为数据流输出
         curl_setopt($curl, CURLOPT_HEADER, 0);
         // 设置获取的信息以文件流的形式返回，而不是直接输出。

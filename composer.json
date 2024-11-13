@@ -18,5 +18,9 @@
     ],
     "require": {
         "php": ">=7.0"
+    },
+    "suggests": {
+        "ext-curl": "*",
+        "ext-redis": "*"
     }
 }

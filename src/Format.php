@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Shiwei\Tools;
 
+/**
+ *  格式化数据显示
+ *  @author ShiweiXi <xishiwei0821@gmail.com>
+ */
 class Format
 {
     /**
@@ -33,7 +37,7 @@ class Format
      *  @param mixed $id
      *  @param mixed $pid
      *  @param mixed $children
-     *  @return array|bool
+     *  @return array
      */
     public static function arrayToTree(array $array, string $id = 'id', string $pid = 'pid', string $children = 'children')
     {
@@ -146,5 +150,32 @@ class Format
         } else {
             return sprintf('%s %s %s', date('Y-m-d', $timestamp), $hour_type, $showTime);
         }
+    }
+
+    /**
+     *  字符串转根据字节长度从指定key开始转数组（方便hex查看）
+     *  @param string  $hex
+     *  @param integer $start_index
+     *  @param integer $byte_length
+     *  @return string[]
+     */
+    public static function strToPoint(string $hex, int $start_index = 1, int $byte_length = 2)
+    {
+        if (empty($hex)) return [];
+
+        $result = [];
+        $index  = 0;
+        while (true) {
+            $offset = $index * $byte_length;
+
+            if (strlen($hex) - 1 < $offset) break;
+
+            $sub = substr($hex, $offset, $byte_length);
+            $result[$index + $start_index] = $sub;
+
+            $index += 1;
+        }
+
+        return $result;
     }
 }

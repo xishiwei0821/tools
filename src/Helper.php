@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Shiwei\Tools;
 
+/**
+ *  常用函数
+ *  @author ShiweiXi <xishiwei0821@gmail.com>
+ */
 class Helper
 {
     /**

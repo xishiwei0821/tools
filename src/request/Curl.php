@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Shiwei\Tools\Request;
 
+/**
+ *  curl请求
+ *  @author ShiweiXi <xishiwei0821@gmail.com>
+ */
 class Curl
 {
     private static $requestMethod = [ 'GET', 'POST', 'PUT', 'DELETE' ];

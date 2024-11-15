@@ -178,4 +178,25 @@ class Format
 
         return $result;
     }
+
+    /**
+     *  文件转base64编码
+     *  @param string $file_path
+     *  @throws \Exception
+     *  @return string
+     */
+    public static function fileToBase64(string $file_path = ''): string
+    {
+        if (!is_file($file_path)) throw new \Exception('缺少文件地址');
+
+        $fb = fopen($file_path, 'rb', false);
+        if (!$fb) throw new \Exception('文件打开失败');
+
+        $binary = fread($fb, filesize($file_path));
+        fclose($fb);
+
+        $base64_string = base64_encode($binary);
+        
+        return $base64_string;
+    }
 }

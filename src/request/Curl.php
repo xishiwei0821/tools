@@ -19,11 +19,10 @@ class Curl
      *  @param array $data   请求数据
      *  @param bool $is_json 是否是json请求，true 将数据转为json，并添加Content-type: application/json;
      *  @param array $header 请求头
-     *  @param bool $https   是否是https请求
      *  @throws \Exception
      *  @return string|array
      */
-    public static function fetch(string $url, string $type = 'GET', array $data = [], bool $is_json = false, array $header = [], bool $https = false)
+    public static function fetch(string $url, string $type = 'GET', array $data = [], bool $is_json = false, array $header = [])
     {
         $request_method = strtoupper($type);
 
@@ -62,10 +61,12 @@ class Curl
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
         // 如果是https请求
-        if ($https) {
+        if (strpos("$" . $url, 'https')) {
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
         }
+
+        if (!strpos('$' . $url, 'https') && !strpos('$' . $url, 'http')) throw new \Exception('请求地址请使用https/http开头');
 
         $response = curl_exec($curl);
         
@@ -74,8 +75,15 @@ class Curl
             curl_close($curl);
             throw new \Exception(curl_error($curl));
         }
-        
+
+        $httpCode    = curl_getinfo($curl,CURLINFO_HTTP_CODE);
+        $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE); 
+        $rheader     = substr($response, 0, $header_size); 
+        $rbody       = substr($response, $header_size);
+
         curl_close($curl);
+        
+        if($httpCode != 200) throw new \Exception(sprintf('Curl 请求错误，错误码: { %s }, header: { %s }, 错误消息: { %s }', $httpCode, $rheader, $rbody));
 
         if ($is_json) {
             $response = str_replace("\"", '"', $response);

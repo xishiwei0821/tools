@@ -11,6 +11,28 @@ namespace Shiwei\Tools;
 class Helper
 {
     /**
+     *  递归创建目录
+     *  @param string $path
+     *  @return bool
+     */
+    public static function createPathDir(string $path = ''): bool
+    {
+        if (empty($path)) return true;
+        
+        if (!is_dir($path)) {
+            if (!self::createPathDir(dirname($path))) {
+                return false;
+            }
+
+            if (!mkdir($path, 0777)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      *  获取当前微秒时间
      *  @return string
      */

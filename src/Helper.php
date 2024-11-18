@@ -33,6 +33,31 @@ class Helper
     }
 
     /**
+     *  获取文件的mine_type 类型 例如 image/jpeg
+     *  @param string $file
+     *  @throws \Exception
+     *  @return string
+     */
+    public static function getFileType(string $file): string
+    {
+        if (!is_file($file)) throw new \Exception('请选择本地文件');
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+
+        if (!$finfo) throw new \Exception('文件打开失败');
+
+        $minetype = finfo_file($finfo, $file);
+
+        finfo_close($finfo);
+
+        $typeArray = explode('/', $minetype);
+
+        if (empty($typeArray)) throw new \Exception('获取文件类型失败');
+
+        return $typeArray[0];
+    }
+
+    /**
      *  获取当前微秒时间
      *  @return string
      */

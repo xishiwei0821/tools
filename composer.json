@@ -6,7 +6,8 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Shiwei\\Tools\\": "src/"
+            "Shiwei\\Tools\\": "src/",
+            "Shiwei\\Tools\\Payment\\": "src/Payment/"
         }
     },
     "authors": [

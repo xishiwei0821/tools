@@ -199,4 +199,44 @@ class Format
         
         return $base64_string;
     }
+
+    /**
+     *  xml转数组
+     *  @param string $xml
+     *  @return array
+     */
+    public static function xmlToArray(string $xml): array
+    {
+        $p = xml_parser_create();
+        xml_parse_into_struct($p, $xml, $vals, $index);
+        xml_parser_free($p);
+    
+        $data = [];
+        foreach ($index as $key => $value) {
+            if ($key == 'xml' || $key == 'XML') {
+                continue;
+            }
+
+            $tag   = strtolower($vals[$value[0]]['tag']);
+            $value = $vals[$value[0]]['value'];
+
+            $data[$tag] = $value;
+        }
+
+        return $data;
+    }
+
+    /**
+     *  数组转xml
+     *  @param array $array
+     *  @return string
+     */
+    public static function arrayToXml(array $array = []): string
+    {
+        $string = "<xml>";
+        foreach ($array as $key => $value) $string .= '<' . $key . '>' . $value . '</' . $key . '>';
+        $string .= "</xml>";
+
+        return $string;
+    }
 }

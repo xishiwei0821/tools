@@ -16,13 +16,13 @@ class Request
      *  发送curl请求
      *  @param string $url   请求地址
      *  @param string $type  请求方式
-     *  @param array $data   请求数据
-     *  @param bool $is_json 是否是json请求，true 将数据转为json，并添加Content-type: application/json;
-     *  @param array $header 请求头
+     *  @param mixed  $data   请求数据
+     *  @param bool   $is_json 是否是json请求，true 将数据转为json，并添加Content-type: application/json;
+     *  @param array  $header 请求头
      *  @throws \Exception
      *  @return string|array
      */
-    public static function fetch(string $url, string $type = 'GET', array $data = [], bool $is_json = false, array $header = [])
+    public static function fetch(string $url, string $type = 'GET', $data = [], bool $is_json = false, array $header = [])
     {
         $request_method = strtoupper($type);
 
@@ -44,11 +44,19 @@ class Request
             $data = [];
         }
 
-        $data = $is_json ? json_encode($data, JSON_UNESCAPED_UNICODE) : $data;
+        if (!strpos('$' . $url, 'https') && !strpos('$' . $url, 'http')) throw new \Exception('请求地址请使用https/http开头');
 
         curl_setopt($curl, CURLOPT_URL, $url);
 
+        // 如果是https请求
+        if (strpos("$" . $url, 'https')) {
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        }
+
         if (!empty($data)) {
+            $data = $is_json ? json_encode($data, JSON_UNESCAPED_UNICODE) : $data;
+
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
         }
@@ -59,14 +67,6 @@ class Request
         curl_setopt($curl, CURLOPT_HEADER, 0);
         // 设置获取的信息以文件流的形式返回，而不是直接输出。
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-
-        // 如果是https请求
-        if (strpos("$" . $url, 'https')) {
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-        }
-
-        if (!strpos('$' . $url, 'https') && !strpos('$' . $url, 'http')) throw new \Exception('请求地址请使用https/http开头');
 
         $response = curl_exec($curl);
         

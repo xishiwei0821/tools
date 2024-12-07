@@ -24,11 +24,11 @@ class Redis
 
     public function __construct(array $options = [])
     {
-        $this->host     = array_key_exists('host', $options)     ? $options['host']     : '127.0.0.1';
-        $this->port     = array_key_exists('post', $options)     ? $options['post']     : 6379;
-        $this->select   = array_key_exists('select', $options)   ? $options['select']   : 0;
-        $this->password = array_key_exists('password', $options) ? $options['password'] : '';
-        $this->prefix   = array_key_exists('prefix', $options)   ? $options['prefix']   : '';
+        $this->host     = array_key_exists('host', $options)     ? (string)$options['host']     : '127.0.0.1';
+        $this->port     = array_key_exists('port', $options)     ? (int)$options['port']        : 6379;
+        $this->select   = array_key_exists('select', $options)   ? (int)$options['select']      : 0;
+        $this->password = array_key_exists('password', $options) ? (string)$options['password'] : '';
+        $this->prefix   = array_key_exists('prefix', $options)   ? (string)$options['prefix']   : '';
 
         $this->initRedis();
     }

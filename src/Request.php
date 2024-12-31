@@ -54,7 +54,7 @@ class Request
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
         }
 
-        if (!empty($data)) {
+        if ($request_method === 'POST' && !empty($data)) {
             $data = $is_json ? json_encode($data, JSON_UNESCAPED_UNICODE) : $data;
 
             curl_setopt($curl, CURLOPT_POST, true);

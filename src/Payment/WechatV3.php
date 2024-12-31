@@ -102,7 +102,7 @@ class WechatV3
     /**
      *  验证签名
      */
-    private function verifySign(array $body = [], string $serial_no = ''): void
+    public function verifySign(array $body = [], string $serial_no = ''): void
     {
         $header = getallheaders();
 
@@ -207,7 +207,7 @@ class WechatV3
         $body = file_get_contents("php://input");
         $body = json_decode($body, true);
 
-        $this->verifySign($body, $serial_no);
+        // $this->verifySign($body, $serial_no);
 
         return $body;
     }

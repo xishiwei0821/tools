@@ -28,7 +28,7 @@ class Helper
      *  @param string $path
      *  @return bool
      */
-    public static function createPathDir(string $path = ''): bool
+    public static function createPathDir(string $path = '', int $permission = 0777): bool
     {
         if (empty($path)) return true;
         
@@ -37,7 +37,7 @@ class Helper
                 return false;
             }
 
-            if (!mkdir($path, 0777)) {
+            if (!mkdir($path, $permission)) {
                 return false;
             }
         }
@@ -137,5 +137,109 @@ class Helper
         }
 
         return $index_tree;
+    }
+
+    /**
+     *  根据指定日期获取日期范围
+     *  @param string $date 日期
+     *  @param string $type 类型
+     *  @param array  $extra 额外数据
+     *  @return array
+     */
+    public static function getDateZone(string $date = '', string $type = '', array $extra = []): array
+    {
+        $date = strtotime($date) ? date('Y-m-d', strtotime($date)) : date('Y-m-d');
+        $type = !empty($type) ? strtoupper($type) : 'TODAY';
+
+        $dateTime = new \DateTime($date);
+
+        $times = [];
+
+        switch ($type) {
+            case 'TODAY':
+                // 今天范围
+                $times[] = $dateTime->format('Y-m-d 00:00:00');
+                $times[] = $dateTime->format('Y-m-d 23:59:59');
+                break;
+            case 'YESTERDAY':
+                // 昨天范围
+                $last_day = $dateTime->modify('-1 days');
+                $times[]  = $last_day->format('Y-m-d 00:00:00');
+                $times[]  = $last_day->format('Y-m-d 23:59:59');
+                break;
+            case 'TOMORROW':
+                // 明天
+                $next_day = $dateTime->modify('+1 days');
+                $times[]  = $next_day->format('Y-m-d 00:00:00');
+                $times[]  = $next_day->format('Y-m-d 23:59:59');
+                break;
+            case 'WEEK':
+                // 本周
+                // 从哪天开始
+                $weekIndex = $extra['week_index'] ?? 0;
+                // 今天所在索引
+                $dayOfWeek = (int)$dateTime->format('w');
+                // 本周第一天
+                $times[]   = $dateTime->modify(sprintf('-%s days', ($dayOfWeek - $weekIndex)))->format('Y-m-d 00:00:00');
+                // 本周最后一天
+                $times[]   = $dateTime->modify('+6 days')->format('Y-m-d 23:59:59');
+                break;
+            case 'LAST_WEEK':
+                // 上周
+                // 从哪天开始
+                $weekIndex = $extra['week_index'] ?? 0;
+                // 这周的第一天
+                $dateTime->setISODate((int)$dateTime->format('o'), (int)$dateTime->format('W'), $weekIndex);
+                // 上周的第一天
+                $times[] = $dateTime->modify('-1 week')->format('Y-m-d 00:00:00');
+                // 上周最后一天
+                $times[] = $dateTime->modify('+6 days')->format('Y-m-d 23:59:59');
+                break;
+            case 'MONTH':
+                // 本月
+                $times[] = $dateTime->modify('first day of this month')->format('Y-m-d 00:00:00');
+                $times[] = $dateTime->modify('last day of this month')->format('Y-m-d 23:59:59');
+                break;
+            case 'LAST_MONTH':
+                // 上月
+                $times[] = $dateTime->modify('-1 month')->format('Y-m-01 00:00:00');
+                $times[] = $dateTime->modify('last day of this month')->format('Y-m-d 23:59:59');
+                break;
+            case 'QUARTER':
+                // 本季
+                $month = $dateTime->format('m');
+                $year  = $dateTime->format('Y');
+    
+                $firstMonth = ($month - 1) - ($month - 1) % 3 + 1;
+    
+                $start_days = new \DateTime($year . '-' . $firstMonth . '-01 00:00:00');
+    
+                $times[] = $start_days->format('Y-m-d 00:00:00');
+                $times[] = $start_days->modify('+3 months')->modify('-1 days')->format('Y-m-d 23:59:59');
+                break;
+            case 'LAST_QUARTER':
+                // 上季度
+                $month = $dateTime->format('m');
+                $year  = $dateTime->format('Y');
+    
+                $firstMonth = $month - 3;
+    
+                if ($firstMonth <= 0) {
+                    $firstMonth += 12;
+                    $year -= 1;
+                }
+    
+                $start_days = new \DateTime($year . '-' . $firstMonth . '-01 00:00:00');
+                $times[] = $start_days->format('Y-m-d 00:00:00');
+                $times[] = $start_days->modify('+3 months')->modify('-1 days')->format('Y-m-d 23:59:59');
+                break;
+            default:
+                // 今天
+                $times[] = $dateTime->format('Y-m-d 00:00:00');
+                $times[] = $dateTime->format('Y-m-d 23:59:59');
+                break;
+        }
+
+        return $times;
     }
 }

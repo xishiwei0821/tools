@@ -233,6 +233,16 @@ class Helper
                 $times[] = $start_days->format('Y-m-d 00:00:00');
                 $times[] = $start_days->modify('+3 months')->modify('-1 days')->format('Y-m-d 23:59:59');
                 break;
+            case 'YEAR':
+                // 今年
+                $times[] = $dateTime->format('Y-01-01 00:00:00');
+                $times[] = $dateTime->format('Y-12-31 23:59:59');
+                break;
+            case 'LAST_YEAR':
+                // 去年
+                $times[] = $dateTime->modify('-1 years')->format('Y-01-01 00:00:00');
+                $times[] = $dateTime->format('Y-12-31 23:59:59');
+                break;
             default:
                 // 今天
                 $times[] = $dateTime->format('Y-m-d 00:00:00');

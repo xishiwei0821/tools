@@ -257,14 +257,14 @@ class Redis
     /**
      *  列表弹出
      */
-    public function listPop($key, $type = 'r', $number = 1)
+    public function listPop($key, $type = 'r')
     {
         $methods = [
             'r' => 'rPop',
             'l' => 'lPop'
         ];
 
-        $number = !empty($number) ? $number : 1;
+        // $number = !empty($number) ? $number : 1;
 
         if (empty($key)) throw new \Exception('键不存在');
 
@@ -272,6 +272,6 @@ class Redis
 
         $method = $methods[$type];
 
-        return $this->redis->$method($key, $number);
+        return $this->redis->$method($key);
     }
 }

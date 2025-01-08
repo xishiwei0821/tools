@@ -235,8 +235,8 @@ class Redis
     public function listPush($key, $value, $type = 'r')
     {
         $methods = [
-            'r' => 'rpush',
-            'l' => 'lpush'
+            'r' => 'rPush',
+            'l' => 'lPush'
         ];
 
         if (empty($key)) throw new \Exception('键不存在');
@@ -260,8 +260,8 @@ class Redis
     public function listPop($key, $type = 'r', $number = 1)
     {
         $methods = [
-            'r' => 'rpop',
-            'l' => 'lpop'
+            'r' => 'rPop',
+            'l' => 'lPop'
         ];
 
         $number = !empty($number) ? $number : 1;

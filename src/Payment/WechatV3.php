@@ -102,7 +102,7 @@ class WechatV3
     /**
      *  验证签名
      */
-    public function verifySign(array $body = [], string $serial_no = ''): void
+    public function verifySign(array $body = []): void
     {
         $header = getallheaders();
 
@@ -133,7 +133,7 @@ class WechatV3
         if (!array_key_exists('Wechatpay-Signature', $header) || empty($header['Wechatpay-Signature'])) throw new \Exception('缺少Wechatpay-Signature');
 
         // // 验证证书是否相同
-        if ($header['Wechatpay-Serial'] != $serial_no) throw new \Exception('证书不匹配');
+        if ($header['Wechatpay-Serial'] != $this->serial_no) throw new \Exception('证书不匹配');
 
         // 时间戳5分钟内有效
         if ($header['Wechatpay-Timestamp'] > time() + 5 * 60) throw new \Exception('请求已过期');
@@ -202,12 +202,12 @@ class WechatV3
     /**
      *  获取回调数据
      */
-    public function getNotifyData(string $serial_no = ''): array
+    public function getNotifyData(): array
     {
         $body = file_get_contents("php://input");
         $body = json_decode($body, true);
 
-        // $this->verifySign($body, $serial_no);
+        $this->verifySign($body);
 
         return $body;
     }

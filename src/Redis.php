@@ -256,10 +256,8 @@ class Redis
 
     /**
      *  列表弹出
-     *  @param mixed $key
-     *  @return void
      */
-    public function listPop($key, $number = 1)
+    public function listPop($key, $type = 'r', $number = 1)
     {
         $methods = [
             'r' => 'rpop',

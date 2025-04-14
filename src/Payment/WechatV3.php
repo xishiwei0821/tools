@@ -190,9 +190,9 @@ class WechatV3
             'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'
         ];
 
-        $realHeader = array_merge($defaultHeader, $header);
+        $header = array_merge($defaultHeader, $header);
 
-        $result = Request::fetch($url, $method, $body, true, $realHeader);
+        $result = Request::fetch($url, $method, $body, $header, 'json', 'json');
 
         if (array_key_exists('code', $result)) throw new \Exception($result['message'] ?? '请求失败');
 

@@ -88,13 +88,13 @@ class WechatV2
         $sign = $this->__sign__($data, $this->mch_secret);
         $data['sign'] = $sign;
 
-        $post_xml = Format::arrayToXml($data);
+        // $post_xml = Format::arrayToXml($data);
 
         $request_url = $this->access_path . $url;
 
-        $result = Request::fetch($request_url, $method, $post_xml, false, $headers);
+        $result = Request::fetch($request_url, $method, $data, $headers, 'xml', 'xml');
 
-        $result = Format::xmlToArray($result);
+        // $result = Format::xmlToArray($result);
 
         if ($result['return_code'] !== 'SUCCESS') throw new \Exception($result['return_msg']);
 
@@ -132,13 +132,13 @@ class WechatV2
 
         $sign_data['sign'] = $sign;
 
-        $post_xml = Format::arrayToXml($sign_data);
+        // $post_xml = Format::arrayToXml($sign_data);
 
         $request_url = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
 
-        $result = Request::fetch($request_url, 'POST', $post_xml, false, ['Content-Type: application/xml']);
+        $result = Request::fetch($request_url, 'POST', $sign_data, [], 'xml', 'xml');
 
-        $result = Format::xmlToArray($result);
+        // $result = Format::xmlToArray($result);
 
         if ($result['return_code'] !== 'SUCCESS') throw new \Exception($result['return_msg']);
 

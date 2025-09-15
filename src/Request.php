@@ -35,6 +35,13 @@ class Request
 
         if (!in_array($request_method, self::$requestMethod)) throw new \Exception('未知的请求方式');
 
+        if ($request_method === 'GET' && !empty($data)) {
+            $params = http_build_query($data);
+            $url = sprintf('%s%s%s', $url, strpos($params, '?') !== false ? '&' : '?', $params);
+
+            $data = [];
+        }
+
         if (!empty($data)) {
             switch ($data_type) {
                 case 'form':
@@ -50,22 +57,12 @@ class Request
                     break;
                 case 'urlencode':
                     $header[] = 'Content-type: application/x-www-form-urlencoded';
-                    $params = [];
-                    foreach ($data as $key => $value) $params[] = sprintf('%s=%s', $key, urlencode($value));
-
-                    $data = implode('&', $params);
+                    $data = http_build_query($data);
                     break;
                 default:
-                    $params = [];
-                    foreach ($data as $key => $value) $params[] = sprintf('%s=%s', $key, urlencode($value));
-        
-                    $data = implode('&', $params);
+                    $data = json_encode($data, JSON_UNESCAPED_UNICODE);
                     break;
             }
-        }
-
-        if ($request_method === 'GET' && !empty($data)) {
-            $url = sprintf('%s%s%s', $url, strpos($params, '?') !== false ? '&' : '?', $params);
         }
 
         curl_setopt($curl, CURLOPT_URL, $url);
@@ -97,17 +94,27 @@ class Request
         }
 
         $httpCode    = curl_getinfo($curl,CURLINFO_HTTP_CODE);
-        $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE); 
+        $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE) ?? 0;
         $rheader     = substr($response, 0, $header_size); 
         $rbody       = substr($response, $header_size);
 
         curl_close($curl);
         
-        if($httpCode != 200) throw new \Exception(sprintf('Curl 请求错误，错误码: { %s }, header: { %s }, 错误消息: { %s }', $httpCode, $rheader, $rbody));
+        if ($httpCode != 200) {
+            throw new \Exception('Curl 请求错误, 错误消息: ' . $rheader . $rbody, $httpCode);
+        }
 
         switch ($return_type) {
             case 'json':
-                $response = str_replace("\"", '"', $response);
+                $response = str_replace("&quot;", "\"", $response);
+                $response = str_replace("\\", "", $response);
+                $response = str_replace("\"{", "{", $response);
+                $response = str_replace("}\"", "}", $response);
+                $response = str_replace("\"[", "[", $response);
+                $response = str_replace("]\"", "]", $response);
+                $response = trim($response, "\"");
+
+                // $response = str_replace("\"", '"', $response);
                 $response = json_decode($response, true);
                 break;
             case 'xml':

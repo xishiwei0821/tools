@@ -94,14 +94,11 @@ class Request
         }
 
         $httpCode    = curl_getinfo($curl,CURLINFO_HTTP_CODE);
-        $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE) ?? 0;
-        $rheader     = substr($response, 0, $header_size); 
-        $rbody       = substr($response, $header_size);
 
         curl_close($curl);
         
         if ($httpCode != 200) {
-            throw new \Exception('Curl 请求错误, 错误消息: ' . $rheader . $rbody, $httpCode);
+            throw new \Exception('Curl 请求错误, 错误消息: ' . $response, $httpCode);
         }
 
         switch ($return_type) {

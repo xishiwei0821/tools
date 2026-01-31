@@ -27,7 +27,7 @@ class Request
      *  @throws \Exception
      *  @return string|array
      */
-    public static function fetch(string $url, string $type = 'GET', $data = [], array $header = [], string $data_type = 'json', string $return_type = 'json')
+    public static function fetch(string $url, string $type = 'GET', $data = [], array $header = [], string $data_type = 'json', string $return_type = 'json', ?callable $stream_callback = null)
     {
         $curl = curl_init();
 
@@ -68,6 +68,10 @@ class Request
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $request_method);
 
+        // 设置请求头
+        // curl_setopt($curl, CURLOPT_HEADER, 0);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+
         // 如果是https请求
         if (strpos("$" . $url, 'https')) {
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
@@ -78,12 +82,15 @@ class Request
             curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
         }
         
-        // 设置请求头
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-        // 设置头文件的信息作为数据流输出
-        curl_setopt($curl, CURLOPT_HEADER, 0);
-        // 设置获取的信息以文件流的形式返回，而不是直接输出。
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        if ($return_type == 'stream') {
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, false);
+            curl_setopt($curl, CURLOPT_WRITEFUNCTION, function ($curl, $data) use ($stream_callback) {
+                is_callable($stream_callback) && $stream_callback($data);
+                return strlen($data);
+            });
+        } else {
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        }
 
         $response = curl_exec($curl);
         
@@ -103,19 +110,11 @@ class Request
 
         switch ($return_type) {
             case 'json':
-                $response = str_replace("&quot;", "\"", $response);
-                $response = str_replace("\\", "", $response);
-                $response = str_replace("\"{", "{", $response);
-                $response = str_replace("}\"", "}", $response);
-                $response = str_replace("\"[", "[", $response);
-                $response = str_replace("]\"", "]", $response);
-                $response = trim($response, "\"");
-
-                // $response = str_replace("\"", '"', $response);
-                $response = json_decode($response, true);
+                $response = is_string(($response)) && json_decode($response) ? json_decode($response, true) : $response;
                 break;
             case 'xml':
                 $response = Format::xmlToArray($response);
+            case 'stream': return $response;
             default: break;
         }
 

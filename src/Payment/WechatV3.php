@@ -145,15 +145,9 @@ class WechatV3
             sodium_crypto_aead_aes256gcm_is_available();
         }
 
-        if (function_exists('\Sodium\crypto_aead_aes256gcm_is_available')) {
-            \Sodium\sodium_crypto_aead_aes256gcm_is_available();
-        }
-
         if (PHP_VERSION_ID >= 70100 && in_array('aes-256-gcm', openssl_get_cipher_methods())) {
             openssl_decrypt($ciphertext, $this->getPrivateKey(), 'aes-256-gcm', OPENSSL_RAW_DATA, $nonce, '', $associated_data);
         }
-
-        throw new \Exception('当前环境不支持');
     }
 
     /**

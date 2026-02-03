@@ -102,50 +102,6 @@ class WechatV2
 
         return $result;
     }
-
-    /**
-     *  调用微信支付获取数据
-     */
-    public function pay(string $order_no, string $price, string $openid, string $body, string $notify_url = '', array $detail = [], array $extra = [])  
-    {
-        $price      = (int)($price * 100);
-        $nonce_str  = (string)Helper::createNonceStr();
-        $notify_url = trim($notify_url);
-        $create_ip  = $_SERVER['SERVER_ADDR'];
-        $trade_type = 'JSAPI';
-
-        $sign_data['appid']            = $this->appid;
-        $sign_data['body']             = $body;
-        $sign_data['mch_id']           = $this->mchid;
-        $sign_data['nonce_str']        = $nonce_str;
-        $sign_data['notify_url']       = $notify_url;
-        $sign_data['openid']           = $openid;
-        $sign_data['out_trade_no']     = $order_no;
-        $sign_data['spbill_create_ip'] = $create_ip;
-        $sign_data['total_fee']        = $price;
-        $sign_data['trade_type']       = $trade_type;
-
-        if (!empty($detail)) $sign_data['detail'] = json_encode($detail);
-
-        // 生成签名
-        $sign = $this->__sign__($sign_data, $this->mch_secret);
-
-        $sign_data['sign'] = $sign;
-
-        // $post_xml = Format::arrayToXml($sign_data);
-
-        $request_url = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
-
-        $result = Request::fetch($request_url, 'POST', $sign_data, [], 'xml', 'xml');
-
-        // $result = Format::xmlToArray($result);
-
-        if ($result['return_code'] !== 'SUCCESS') throw new \Exception($result['return_msg']);
-
-        if ($result['result_code'] !== 'SUCCESS') throw new \Exception($result['err_code'] . ':' . $result['err_code_des']);
-
-        return $this->__get_pay_data__($result);
-    }
     
     /**
      *  获取微信回调数据

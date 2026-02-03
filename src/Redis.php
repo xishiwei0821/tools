@@ -88,13 +88,13 @@ class Redis
      *  删除key->value类型数据值
      *  @param string $key # 键
      */
-    public function stringDel($key)
+    public function del($key)
     {
         if (empty($key)) throw new \Exception('key不存在');
 
         if (is_array($key)) {
             foreach ($key as $field) {
-                $this->stringDel($this->prefix . $field);
+                $this->del($this->prefix . $field);
             }
         } else {
             if ($this->redis->exists($this->prefix . $key)) {

@@ -239,30 +239,4 @@ class Format
 
         return $string;
     }
-
-    public static function number2column(int $number): string
-    {
-        if ($number < 0) throw new \InvalidArgumentException('转换索引必须大于0');
-
-        $column = '';
-        while ($number >= 0) {
-            $column = chr(65 + ($number % 26)) . $column;
-            $number = (int)($number / 26) - 1;
-        }
-
-        return $column;
-    }
-
-    public static function column2number(string $column): int
-    {
-        if (!preg_match('/^[A-Za-z]+$/', $column)) throw new \InvalidArgumentException('转换列格式错误');
-        
-        $number = 0;
-        $column = strtoupper($column);
-        for ($i = 0; $i < strlen($column); $i++) {
-            $char = $column[$i];
-            $number = $number * 26 + (ord($char) - ord('A'));
-        }
-        return $number;
-    }
 }

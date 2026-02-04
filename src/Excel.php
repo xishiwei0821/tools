@@ -139,9 +139,6 @@ class Excel
             $excel = $this->excel;
 
             Helper::createPathDir($save_path);
-
-            $random    = date('YmdHis') . mt_rand(1000, 9999);
-            $file_name = empty($file_name) ? $random : $file_name . '_' . $random;
             $file_ext  = 'xlsx';
 
             $excel->fileName(sprintf('%s/%s.%s', $save_path, $file_name, $file_ext));

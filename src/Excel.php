@@ -55,9 +55,10 @@ class Excel
         $column = strtoupper($column);
         for ($i = 0; $i < strlen($column); $i++) {
             $char = $column[$i];
-            $number = $number * 26 + (ord($char) - ord('A'));
+            $number = $number * 26 + (ord($char) - (ord('A') - 1));
         }
-        return $number;
+        
+        return $number - 1;
     }
 
     private function getExcel()

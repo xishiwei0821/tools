@@ -71,6 +71,118 @@ class Helper
     }
 
     /**
+     *  下载网络图片到指定目录
+     *  @param string $file_url
+     *  @param string $save_path
+     *  @return string 图片地址
+     */
+    public static function downloadImage(string $file_url, string $save_path): string
+    {
+        $file_content = @file_get_contents($file_url);
+
+        if ($file_content === false) throw new \Exception('无法读取图片内容');
+
+        [$_, $_, $type] = @getimagesize($file_url);
+
+        if (!in_array($type, [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF, IMAGETYPE_SVG, IMAGETYPE_ICO])) {
+            throw new \Exception('图片格式错误');
+        }
+
+        $ext_map = [
+            IMAGETYPE_JPEG => 'jpg',
+            IMAGETYPE_PNG  => 'png',
+            IMAGETYPE_GIF  => 'gif',
+            IMAGETYPE_SVG  => 'svg',
+            IMAGETYPE_ICO  => 'ico',
+        ];
+
+        if (!@getimagesize($file_content)) throw new \Exception('下载的内容不是有效的图片格式');
+
+        $file_name = date('YmdHis') . sprintf('%04d', 0, 9999);
+        $file_ext  = $ext_map[$type] ?? 'jpg';
+
+        $full_path = $save_path . $file_name . '.' . $file_ext;
+
+        if (!file_put_contents($full_path, $file_content)) throw new \Exception('写入内容失败');
+
+        return $full_path;
+    }
+
+    /**
+     *  压缩图片
+     *  @param string $file_path  图片地址
+     *  @param string $save_path  保存目录
+     *  @param int    $max_width  最大宽度
+     *  @param int    $max_height 最大高度
+     *  @return string 图片地址
+     */
+    public static function compressImage(string $file_path, string $save_path, int $max_width, int $max_height): string
+    {
+        if (empty($file_path)) throw new \Exception('缺少图片地址');
+
+        $image = @file_get_contents($file_path);
+        if ($image === false) throw new \Exception('无法读取图片内容');
+
+        list($width, $height, $type) = @getimagesize($file_path);
+        if (!$width || !$height) throw new \Exception('获取图片尺寸错误');
+
+        if ($width <= $max_width && $height <= $max_height) {
+            return $file_path;
+        }
+
+        $scaleX = $max_width / $width;
+        $scaleY = $max_height / $height;
+        $scale  = min($scaleX, $scaleY);
+
+        $new_width = (int)floor($width * $scale);
+        $new_height = (int)floor($height * $scale);
+        
+        // 新建目标
+        $file_name = date('YmdHis') . sprintf('%04d', 0, 9999);
+
+        $dstImg = imagecreatetruecolor($new_width, $new_height);
+
+        switch ($type) {
+            case IMAGETYPE_JPEG:
+                $srcImg = imagecreatefromjpeg($file_path);
+                if ($srcImg === false) throw new \Exception('无法读取JPG图片内容');
+
+                imagecopyresampled($dstImg, $srcImg, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+
+                $new_file_path = $save_path . $file_name . '.' . 'jpg';
+                imagejpeg($dstImg, $new_file_path, 90);
+                break;
+            case IMAGETYPE_PNG:
+                $srcImg = imagecreatefrompng($file_path);
+                if ($srcImg === false) throw new \Exception('无法读取PNG图片内容');
+
+                // 保留PNG透明的
+                imagealphablending($dstImg, false);
+                imagesavealpha($dstImg, true);
+
+                imagecopyresampled($dstImg, $srcImg, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+
+                $new_file_path = $save_path . $file_name . '.' . 'png';
+                imagepng($dstImg, $new_file_path);
+                break;
+            case IMAGETYPE_GIF:
+                $srcImg = imagecreatefromgif($file_path);
+                if ($srcImg === false) throw new \Exception('无法读取GIF图片内容');
+
+                imagecopyresampled($dstImg, $srcImg, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+
+                $new_file_path = $save_path . $file_name . '.' . 'gif';
+                imagegif($dstImg, $new_file_path);
+                break;
+            default: throw new \Exception('暂时只支持JPG/PNG格式图片');
+        }
+
+        imagedestroy($dstImg);
+
+        return $new_file_path;
+    }
+
+    /**
      *  获取当前微秒时间
      *  @return string
      */

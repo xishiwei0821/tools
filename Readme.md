@@ -10,6 +10,8 @@
 |createNonceStr|静态调用|创建随机字符串|
 |createPathDir|静态调用|创建多级目录|
 |getFileType|静态调用|获取本地文件mini_type类型|
+|downloadImage|静态调用|下载网络图片到指定目录|
+|compressImage|静态调用|根据最大宽高压缩图片|
 |getMicroTime|静态调用|获取13位微妙时间戳|
 |getAllProducts|静态调用|获取笛卡尔乘积函数|
 |getIndexTree|静态调用|根据指定key将数组转为索引函数|

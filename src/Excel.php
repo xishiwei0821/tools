@@ -84,8 +84,6 @@ class Excel
      */
     public function read(string $file_path, array $sheet_type = []): array
     {
-        if (!file_exists($file_path)) throw new \InvalidArgumentException('文件不存在');
-
         try {
             $excel = $this->excel;
             $excel = $excel->setType($sheet_type);
@@ -106,8 +104,6 @@ class Excel
      */
     public function course_handle(string $file_path, array $sheet_type = [], ?callable $callback = null): void
     {
-        if (!file_exists($file_path)) throw new \InvalidArgumentException('文件不存在');
-        
         try {
             $excel = $this->excel;
             $excel = $excel->setType($sheet_type);

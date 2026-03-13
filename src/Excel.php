@@ -82,7 +82,7 @@ class Excel
      *  @param string $file_path
      *  @return array
      */
-    public function read(string $file_path, array $sheet_type = []): array
+    public function read(string $file_path, array $sheet_type = [], array $use_sheet_name = []): array
     {
         try {
             $excel = $this->excel;
@@ -91,7 +91,11 @@ class Excel
             $sheetList = $excel->openFile($file_path)->sheetList();
 
             $result = [];
-            foreach ($sheetList as $sheetName) $result[$sheetName] = $excel->openSheet($sheetName)->getSheetData();
+            foreach ($sheetList as $sheetName) {
+                if (!empty($use_sheet_name) && !in_array($sheetName, $use_sheet_name)) continue;
+
+                $result[$sheetName] = $excel->openSheet($sheetName)->getSheetData();
+            }
             
             return $result;
         } catch (\Exception $exception) {
@@ -102,7 +106,7 @@ class Excel
     /**
      *  游标处理数据
      */
-    public function course_handle(string $file_path, array $sheet_type = [], ?callable $callback = null): void
+    public function course_handle(string $file_path, array $sheet_type = [], ?callable $callback = null, array $use_sheet_name = []): void
     {
         try {
             $excel = $this->excel;
@@ -111,6 +115,8 @@ class Excel
             $sheetList = $excel->openFile($file_path)->sheetList();
 
             foreach ($sheetList as $sheetName) {
+                if (!empty($use_sheet_name) && !in_array($sheetName, $use_sheet_name)) continue;
+
                 $excel->openSheet($sheetName);
 
                 while (($row = $excel->nextRow()) !== NULL) is_callable($callback) && $callback($sheetName, $row);

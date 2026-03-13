@@ -119,7 +119,11 @@ class Excel
 
                 $excel->openSheet($sheetName);
 
-                while (($row = $excel->nextRow()) !== NULL) is_callable($callback) && $callback($sheetName, $row);
+                $index = 0;
+                while (($row = $excel->nextRow()) !== NULL) {
+                    is_callable($callback) && $callback($sheetName, $row, $index);
+                    $index += 1;
+                }
             }
         } catch (\Exception $exception) {
             throw $exception;
